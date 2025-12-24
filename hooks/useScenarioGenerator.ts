@@ -33,8 +33,8 @@ export default function useScenarioGenerator(): UseScenarioGeneratorResult {
     }
 
     ${
-      contraintes
-        ? `Containtes particulières a prendre en compte : ${contraintes}`
+      contrainte
+        ? `Containtes particulières a prendre en compte : ${contrainte}`
         : ""
     }
 

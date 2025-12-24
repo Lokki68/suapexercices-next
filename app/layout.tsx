@@ -1,3 +1,5 @@
+import Footer from "@/components/customs/Footer";
+import Header from "@/components/customs/Header";
 import { frFR } from "@clerk/localizations";
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
@@ -28,9 +30,13 @@ export default function RootLayout({
     <ClerkProvider localization={frFR}>
       <html lang="en">
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          className={`${geistSans.variable} ${geistMono.variable} antialiased bg-linear-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-100 flex flex-col min-h-screen`}
         >
-          {children}
+          <div className="flex1 flex flex-col p-4 sm:p-8">
+            <Header />
+            <main className="flex-1 flex flex-col ">{children}</main>
+          </div>
+          <Footer />
         </body>
       </html>
     </ClerkProvider>

@@ -1,6 +1,7 @@
 "use client";
 
 import ErrorDisplay from "@/components/customs/ErrorDisplay";
+import ScenarioActions from "@/components/customs/ScenarioActions";
 import ScenarioDisplay from "@/components/customs/ScenarioDisplay";
 import UsageIndicator from "@/components/customs/UsageIndicator";
 import { Button } from "@/components/ui/button";
@@ -15,9 +16,10 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import useScenarioGenerator from "@/hooks/useScenarioGenerator";
+import { UserStatus } from "@/types";
 import { UserButton } from "@clerk/nextjs";
 import { Ambulance, Info, Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface InterventionType {
   value: string;
@@ -38,37 +40,49 @@ function InterventionSelectItems({ value, label }: InterventionType) {
 }
 
 export default function Home() {
+  const [userStatus, setUserStatus] = useState<UserStatus | null>(null);
+  const [statusLoading, setStatusLoading] = useState(false);
   const [type, setType] = useState<string>("malaise");
   const [contraintes, setContraintes] = useState<string>("");
   const { scenario, loading, error, generateScenario } = useScenarioGenerator();
+
+  const fetchStatus = async () => {
+    try {
+      const response = await fetch("/api/user/status");
+      const data = await response.json();
+      setUserStatus(data);
+    } catch (error) {
+      console.error("Erreur: ", error);
+    } finally {
+      setStatusLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchStatus();
+  }, []);
 
   const handleGenerate = () => {
     generateScenario(type, contraintes);
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-100 flex flex-col items-center p-8">
-      <div className="w-full max-w-5xl flex justify-between items-start mb-4">
-        <UsageIndicator />
-        <UserButton
-          appearance={{
-            elements: {
-              avatarBox: "w-10 h-10",
-            },
-          }}
-        />
-      </div>
+    <div className=" flex flex-col items-center p-8">
       <div className="max-w-5xl w-full space-y-8">
-        <header className="text-center">
+        <section className="text-center">
           <h1 className="flex items-center justify-center gap-2 text-4xl font-bold tracking-tight text-red-500 mb-2">
             <span>
               <Ambulance />
             </span>
             Générateur d'intervention
           </h1>
-          <p>Simulateur de cas de secours à personne - entraînement pompiers</p>
-        </header>
-        <div className="flex flex-col items-center justify-center gap-4">
+          <p>
+            Simulateur de cas de secours à personne - dédié aux entraînement
+            pompiers
+          </p>
+        </section>
+
+        <section className="flex flex-col items-center justify-center gap-4">
           <div className="flex flex-col md:flex-row items-start justify-center gap-4">
             <div className="w-[250px]">
               <Label className="text-gray-300">Type d'intervention</Label>
@@ -100,7 +114,7 @@ export default function Home() {
           <Button
             onClick={handleGenerate}
             disabled={loading}
-            className="bg-red-600 hover:bg-red-700 text-white rounded-xl text-lg px-6 py-5"
+            className="bg-red-600 hover:bg-red-700 text-white rounded-xl text-lg px-6 py-5 my-4"
           >
             {loading ? (
               <>
@@ -111,9 +125,23 @@ export default function Home() {
               "🧩 Générer une intervention"
             )}
           </Button>
-        </div>
+        </section>
+
         {error && <ErrorDisplay error={error} />}
+
         {scenario && <ScenarioDisplay scenario={scenario} />}
+
+        {scenario && (
+          <ScenarioActions
+            scenario={scenario}
+            type={type}
+            contraintes={contraintes}
+            isPremium={userStatus?.isPremium || false}
+            savedScenarioId={""}
+            onSaved={() => console.log("Sauvergardé ")}
+            onDeleted={() => console.log("Effacer ")}
+          />
+        )}
       </div>
 
       {!scenario && (
@@ -123,8 +151,10 @@ export default function Home() {
               <span>
                 <Info size={16} />
               </span>
-              Séléctionner un type d'intervention et Cliquer sur générer une
-              intervention
+              Séléctionner un type d'intervention, ajouter des contraintes
+              particulières si besoin.
+              <br />
+              Cliquer sur générer une intervention
             </p>
           </CardContent>
         </Card>

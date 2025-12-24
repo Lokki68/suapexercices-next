@@ -21,7 +21,7 @@ export interface Scenario {
   situation: string;
   bilan_initial: BilanInitial;
   evolution: EvolutionStep[];
-  objectif_pedagoqique: string;
+  objectif_pedagogique: string;
 }
 
 export interface SavedScenario {
@@ -39,6 +39,14 @@ export interface User {
   email: string;
   name: string;
   isPremium: boolean;
+}
+
+export interface UserStatus {
+  isPremium: boolean;
+  generationsUsed: number;
+  maxGenerations: number;
+  remainingGenerations: number;
+  premiumUntil?: string;
 }
 
 export interface Session {

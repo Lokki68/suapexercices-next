@@ -1,17 +1,10 @@
 "use client";
 
+import { UserStatus } from "@/types";
 import { Crown, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-
-interface UserStatus {
-  isPremium: boolean;
-  generationsUsed: number;
-  maxGenerations: number;
-  remainingGenerations: number;
-  premiumUntil?: string;
-}
 
 export default function UsageIndicator() {
   const [status, setStatus] = useState<UserStatus | null>(null);
