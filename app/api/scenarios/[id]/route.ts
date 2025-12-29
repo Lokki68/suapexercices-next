@@ -4,8 +4,9 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const { userId } = await auth();
 
   if (!userId) {
@@ -31,7 +32,7 @@ export async function GET(
   }
 
   try {
-    const scenario = await getScenarioById(params.id, userId);
+    const scenario = await getScenarioById(id, userId);
 
     if (!scenario) {
       return NextResponse.json(
@@ -49,8 +50,9 @@ export async function GET(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const { userId } = await auth();
 
   if (!userId) {
@@ -58,7 +60,7 @@ export async function DELETE(
   }
 
   try {
-    const deleted = await deleteScenario(params.id, userId);
+    const deleted = await deleteScenario(id, userId);
 
     if (!deleted) {
       return NextResponse.json(

@@ -20,7 +20,7 @@ export async function GET() {
   const metadata = user.publicMetadata;
 
   const isPremium = metadata?.isPremium || false;
-  const generationsUsed = metadata?.generationsUsed || 0;
+  const generationsUsed = Number(metadata?.generationsUsed) || 0;
   const maxGenerations = metadata?.isPremium ? 999999 : 5;
 
   return NextResponse.json({

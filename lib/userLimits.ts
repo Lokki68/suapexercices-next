@@ -1,4 +1,3 @@
-import { UserMetadata } from "@/types";
 import { auth, clerkClient, currentUser } from "@clerk/nextjs/server";
 
 export const FREE_LIMITS = 5;
@@ -20,12 +19,12 @@ export async function checkUserLimit() {
 
   const metadata = user.publicMetadata;
 
-  const isPremium = metadata?.isPremium || false;
-  const generationsUsed = metadata?.generationsUsed || 0;
+  const isPremium = Boolean(metadata?.isPremium) || false;
+  const generationsUsed = Number(metadata?.generationsUsed) || 0;
   const maxGenerations = isPremium ? PREMIUM_LIMITS : FREE_LIMITS;
 
   if (isPremium && metadata.premiumUntil) {
-    const expirationDate = new Date(metadata.premiumUntil);
+    const expirationDate = new Date(metadata.premiumUntil as string);
     if (expirationDate < new Date()) {
       await client.users.updateUser(userId, {
         publicMetadata: {
@@ -68,7 +67,7 @@ export async function incrementUserUsage() {
     throw new Error("Utilisateur introuvable");
   }
   const metadata = user.publicMetadata;
-  const generationsUsed = (metadata?.generationsUsed || 0) + 1;
+  const generationsUsed = Number(metadata?.generationsUsed || 0) + 1;
 
   await client.users.updateUser(userId, {
     publicMetadata: {

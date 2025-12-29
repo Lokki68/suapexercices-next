@@ -27,19 +27,21 @@ export async function saveScenario(
 ): Promise<SavedScenario> {
   const result = await sql`
     INSERT INTO scenarios (user_id, scenario, type, contraintes, title)
-    VALUES (${userId}, ${scenario}, ${type}, ${contraintes}, ${title})
+    VALUES (${userId}, ${JSON.stringify(
+    scenario
+  )}, ${type}, ${contraintes}, ${title})
     RETURNING *
   `;
 
-  const row = result.row[0];
+  const row = result.rows[0];
   return {
     id: row.id,
-    userId: row.user_id,
+    userId: row.userid,
     scenario: row.scenario,
     type: row.type,
     contraintes: row.contraintes,
     title: row.title,
-    createdAt: row.created_at,
+    createdAt: row.createdat,
   };
 }
 
@@ -53,12 +55,12 @@ export async function getUserScenarios(userId: string, limit: number = 50) {
 
   return result.rows.map((row) => ({
     id: row.id,
-    userId: row.user_id,
+    userId: row.userid,
     scenario: row.scenario,
     type: row.type,
     contraintes: row.contraintes,
     title: row.title,
-    createdAt: row.created_at,
+    createdAt: row.createdat,
   }));
 }
 
@@ -72,16 +74,16 @@ export async function getScenarioById(id: string, userId: string) {
     return null;
   }
 
-  const row = result.row[0];
+  const row = result.rows[0];
 
   return {
     id: row.id,
-    userId: row.user_id,
+    userId: row.userid,
     scenario: row.scenario,
     type: row.type,
     contraintes: row.contraintes,
     title: row.title,
-    createdAt: row.created_at,
+    createdAt: row.createdat,
   };
 }
 
@@ -91,7 +93,7 @@ export async function deleteScenario(id: string, userId: string) {
     WHERE id = ${id} AND user_id = ${userId};
   `;
 
-  return result.rowCount > 0;
+  return (result.rowCount ?? 0) > 0;
 }
 
 export async function updateScenarioTitle(
@@ -105,5 +107,5 @@ export async function updateScenarioTitle(
     WHERE id = ${id} AND user_id = ${userId};
   `;
 
-  return result.rowCount > 0;
+  return (result.rowCount ?? 0) > 0;
 }
